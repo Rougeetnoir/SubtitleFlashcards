@@ -12,6 +12,8 @@ const ngslPath = path.join(projectRoot, "data", "ngsl.csv")
 const commonWordsPath = path.join(projectRoot, "data", "commonWords.json")
 const outputPath = path.join(projectRoot, "src", "data", "difficultWords.ts")
 const jsonOutputPath = path.join(projectRoot, "data", "difficultWords.json")
+const cliArgs = process.argv.slice(2)
+const pruneOnly = cliArgs.includes("--prune-only")
 
 const SUBTLEX_TOTAL_TOKENS = 51_000_000
 const SUBTLEX_COMMON_LIMIT = 5000
@@ -20,6 +22,17 @@ const difficultyRank = new Map(difficultyOrder.map((level, index) => [level, ind
 let dictionaryModule
 
 async function main() {
+  if (pruneOnly) {
+    const pruned = await pruneUsingExistingWordList()
+    if (pruned) return
+    console.warn(
+      "[prune-only] Falling back to full rebuild because existing list was unavailable.",
+    )
+  }
+  await buildFromSources()
+}
+
+async function buildFromSources() {
   const configRaw = await readFile(configPath, "utf8")
   const sources = JSON.parse(configRaw)
   const exclusions = await loadExclusions(exclusionPath)
@@ -82,6 +95,53 @@ async function main() {
   console.log(
     `Generated ${entries.length} difficult words from ${sources.length} source groups.`,
   )
+}
+
+async function pruneUsingExistingWordList() {
+  const [existingData, exclusions] = await Promise.all([
+    readExistingWordList(jsonOutputPath),
+    loadExclusions(exclusionPath),
+  ])
+
+  if (!existingData || !Array.isArray(existingData.difficultWords)) {
+    console.warn(
+      "[prune-only] Existing difficultWords.json not found or invalid. Running full rebuild instead.",
+    )
+    return false
+  }
+
+  const normalizedExclusions = new Set(
+    Array.from(exclusions).map((word) => normalizeWord(word)).filter(Boolean),
+  )
+
+  const originalCount = existingData.difficultWords.length
+  const filteredEntries = existingData.difficultWords.filter(
+    (entry) => !normalizedExclusions.has(normalizeWord(entry.word)),
+  )
+
+  const sortedEntries = filteredEntries.sort((a, b) =>
+    a.word.localeCompare(b.word),
+  )
+
+  const content = generateFile(sortedEntries)
+  await writeFile(outputPath, content, "utf8")
+  await writeFile(
+    jsonOutputPath,
+    JSON.stringify(
+      {
+        difficultWords: sortedEntries,
+        difficultWordList: sortedEntries.map((entry) => entry.word),
+      },
+      null,
+      2,
+    ),
+    "utf8",
+  )
+
+  console.log(
+    `[prune-only] Removed ${originalCount - sortedEntries.length} words. Total now ${sortedEntries.length}.`,
+  )
+  return true
 }
 
 function loadSubtlexData() {
@@ -323,6 +383,15 @@ export const difficultWords: DifficultWordEntry[] = `
 
 export const difficultWordList = ${listSerialized} as const
 `
+}
+
+async function readExistingWordList(filePath) {
+  try {
+    const raw = await readFile(filePath, "utf8")
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
 }
 
 main().catch((err) => {

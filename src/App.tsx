@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   AlertTriangle,
   FileText,
   ListChecks,
   Sparkles,
   Upload,
+  Volume2,
 } from "lucide-react"
 
 import {
@@ -74,7 +75,16 @@ function App() {
   const [words, setWords] = useState<ExtractedWord[]>([])
   const [error, setError] = useState<string | null>(null)
   const [tooEasyWords, setTooEasyWords] = useState<string[]>([])
+  const [speechSupported, setSpeechSupported] = useState(false)
+  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle")
+  const [syncMode, setSyncMode] = useState<"merge" | "regen">("merge")
+  const [syncError, setSyncError] = useState<string | null>(null)
+  const [syncResult, setSyncResult] = useState<
+    { added: number; total: number; regenerated?: boolean } | null
+  >(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const speechVoiceRef = useRef<SpeechSynthesisVoice | null>(null)
+  const isDev = import.meta.env.DEV
 
   const totalOccurrences = useMemo(
     () => words.reduce((sum, word) => sum + word.occurrences, 0),
@@ -153,6 +163,40 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+      return
+    }
+
+    const synth = window.speechSynthesis
+
+    function selectVoice() {
+      const voices = synth.getVoices()
+      if (voices.length === 0) return
+      const preferred =
+        voices.find((voice) => voice.lang?.toLowerCase() === "en-us") ??
+        voices.find((voice) => voice.lang?.toLowerCase().includes("en-us")) ??
+        voices.find((voice) => voice.lang?.toLowerCase().startsWith("en")) ??
+        voices[0]
+
+      speechVoiceRef.current = preferred ?? null
+      setSpeechSupported(true)
+    }
+
+    selectVoice()
+    const previousHandler = synth.onvoiceschanged
+    synth.addEventListener?.("voiceschanged", selectVoice)
+    synth.onvoiceschanged = selectVoice
+
+    return () => {
+      synth.removeEventListener?.("voiceschanged", selectVoice)
+      if (synth.onvoiceschanged === selectVoice) {
+        synth.onvoiceschanged = previousHandler ?? null
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     localStorage.setItem(
       "subtitle-flashcards-too-easy",
       JSON.stringify(Array.from(new Set(tooEasyWords))),
@@ -194,25 +238,105 @@ function App() {
     URL.revokeObjectURL(url)
   }
 
+  const speakWord = useCallback(
+    (word: string) => {
+      if (!speechSupported || typeof window === "undefined") return
+      try {
+        const synth = window.speechSynthesis
+        synth.cancel()
+        const utterance = new SpeechSynthesisUtterance(word)
+        const voice = speechVoiceRef.current
+        if (voice) {
+          utterance.voice = voice
+          utterance.lang = voice.lang ?? "en-US"
+        } else {
+          utterance.lang = "en-US"
+        }
+        utterance.rate = 0.95
+        synth.speak(utterance)
+      } catch (err) {
+        console.error("Failed to speak word", err)
+      }
+    },
+    [speechSupported],
+  )
+
+  async function syncTooEasyWordsToRepo(options?: { regenerate?: boolean }) {
+    if (!isDev || tooEasyWords.length === 0) return
+    const regenerate = Boolean(options?.regenerate)
+    setSyncMode(regenerate ? "regen" : "merge")
+    setSyncStatus("syncing")
+    setSyncError(null)
+    try {
+      const response = await fetch("/api/too-easy", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          words: tooEasyWords,
+          regenerate,
+        }),
+      })
+      const textOnError = await (async () => {
+        if (response.ok) return null
+        try {
+          const text = await response.text()
+          return text || null
+        } catch {
+          return null
+        }
+      })()
+
+      if (!response.ok) {
+        throw new Error(textOnError || "同步失败，请检查终端日志")
+      }
+
+      const data = (await response.json().catch(() => null)) as
+        | { added?: number; total?: number; regenerated?: boolean }
+        | null
+      if (data && typeof data.added === "number" && typeof data.total === "number") {
+        setSyncResult({
+          added: data.added,
+          total: data.total,
+          regenerated: Boolean(data.regenerated),
+        })
+      } else {
+        setSyncResult(null)
+      }
+      setSyncStatus("success")
+      window.setTimeout(() => {
+        setSyncStatus("idle")
+      }, 4000)
+    } catch (err) {
+      setSyncStatus("error")
+      setSyncResult(null)
+      setSyncError(err instanceof Error ? err.message : "同步失败，请稍后重试")
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-muted/30">
-      <main className="container max-w-5xl space-y-8 py-12">
-        <div className="flex flex-col items-center text-center">
-          <Badge variant="secondary" className="mb-3">
+    <div className="min-h-screen px-4 py-10 sm:py-12">
+      <main className="container relative z-10 max-w-5xl space-y-10 py-4 lg:py-10">
+        <section className="flex flex-col items-center rounded-[32px] border border-border/50 bg-card/80 px-6 py-10 text-center shadow-[0_40px_90px_rgba(101,123,131,0.2)] backdrop-blur">
+          <Badge
+            variant="secondary"
+            className="mb-4 border-primary/30 bg-primary/15 text-primary tracking-[0.35em] uppercase"
+          >
             Beta · Vocabulary Lab
           </Badge>
-          <h1 className="text-4xl font-semibold tracking-tight">
+          <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Subtitle Flashcards
           </h1>
-          <p className="mt-3 max-w-2xl text-base text-muted-foreground">
+          <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
             上传一份 <code>.srt</code> 字幕文件，我们会解析出台词、匹配 TOEFL/GRE
             示例难词，并按出现频次排序，帮助你快速做成记忆卡片。
           </p>
-        </div>
+        </section>
 
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
           <div className="space-y-6">
-            <Card className="border-muted-foreground/20">
+            <Card className="border-border/50 bg-card/80 shadow-[0_25px_70px_rgba(101,123,131,0.15)] backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Upload className="h-5 w-5 text-primary" />
@@ -239,7 +363,7 @@ function App() {
                   选择字幕文件
                 </Button>
 
-                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                <div className="rounded-2xl border border-dashed border-border/40 bg-background/70 p-4 text-sm text-muted-foreground">
                   <p className="font-medium text-foreground">使用建议</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5">
                     <li>建议选择 15-45 分钟的剧集片段，词频更集中</li>
@@ -249,7 +373,7 @@ function App() {
                 </div>
 
                 {subtitleLines.length > 0 && (
-                  <div className="rounded-xl bg-primary/5 p-4 text-sm">
+                  <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm">
                     <p className="font-medium text-primary">
                       已解析 {subtitleLines.length} 行字幕
                     </p>
@@ -269,7 +393,7 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card className="border-muted-foreground/20">
+            <Card className="border-primary/30 bg-primary/5 shadow-[0_20px_60px_rgba(38,139,210,0.2)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Sparkles className="h-5 w-5 text-primary" />
@@ -284,7 +408,7 @@ function App() {
                   </p>
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border bg-background p-4">
+                    <div className="rounded-2xl border border-border/40 bg-background/80 p-4 shadow-sm">
                       <p className="text-xs uppercase text-muted-foreground">
                         字幕行数
                       </p>
@@ -292,13 +416,13 @@ function App() {
                         {subtitleLines.length}
                       </p>
                     </div>
-                    <div className="rounded-2xl border bg-background p-4">
+                    <div className="rounded-2xl border border-border/40 bg-background/80 p-4 shadow-sm">
                       <p className="text-xs uppercase text-muted-foreground">
                         唯一难词
                       </p>
                       <p className="text-2xl font-semibold">{words.length}</p>
                     </div>
-                    <div className="rounded-2xl border bg-background p-4">
+                    <div className="rounded-2xl border border-border/40 bg-background/80 p-4 shadow-sm">
                       <p className="text-xs uppercase text-muted-foreground">
                         总频次
                       </p>
@@ -309,7 +433,7 @@ function App() {
               </CardContent>
             </Card>
 
-            <Card className="border-muted-foreground/20">
+            <Card className="border-accent/30 bg-card/85 shadow-[0_25px_70px_rgba(181,137,0,0.2)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <ListChecks className="h-5 w-5 text-primary" />
@@ -345,11 +469,81 @@ function App() {
                     复制内容
                   </Button>
                 </div>
+                {isDev && (
+                  <div className="space-y-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-3 py-2">
+                    <p className="text-xs text-muted-foreground">
+                      本地开发中可直接写入 <code>data/excludedWords.json</code>{" "}
+                      ，需要重新生成难词文件时再另外触发。
+                    </p>
+                    <div className="flex flex-col gap-2 text-xs">
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => syncTooEasyWordsToRepo({ regenerate: false })}
+                          disabled={
+                            tooEasyWords.length === 0 || syncStatus === "syncing"
+                          }
+                        >
+                          {syncStatus === "syncing" && syncMode === "merge"
+                            ? "写入中..."
+                            : "写入排除词"}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => syncTooEasyWordsToRepo({ regenerate: true })}
+                          disabled={
+                            tooEasyWords.length === 0 || syncStatus === "syncing"
+                          }
+                        >
+                          {syncStatus === "syncing" && syncMode === "regen"
+                            ? "重建中..."
+                            : "写入并重建词库"}
+                        </Button>
+                        {syncStatus === "success" && (
+                          <span className="text-green-600">
+                            已写入 {syncResult ? `新增 ${syncResult.added} 个词` : "成功"}
+                            {syncResult?.regenerated
+                              ? "，并快速更新词库文件。"
+                              : "。"}
+                          </span>
+                        )}
+                        {syncStatus === "error" && (
+                          <span className="text-red-500">
+                            {syncError || "同步失败，请查看终端输出。"}
+                          </span>
+                        )}
+                      </div>
+                      {syncStatus !== "error" && syncResult && syncStatus !== "syncing" && (
+                        <span className="text-muted-foreground">
+                          当前排除词库共 {syncResult.total} 个词。
+                          {syncResult.regenerated ? (
+                            <>
+                              {" "}
+                              已基于最新排除词快速更新{" "}
+                              <code>src/data/difficultWords.ts</code>。若修改了{" "}
+                              <code>data/wordSources.json</code>{" "}
+                              等配置，仍需运行 <code>npm run update-word-list</code>{" "}
+                              完整重建。
+                            </>
+                          ) : (
+                            <>
+                              {" "}
+                              如需更新 <code>src/data/difficultWords.ts</code>{" "}
+                              ，可点击“写入并重建”或运行{" "}
+                              <code>npm run update-word-list</code>。
+                            </>
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
 
-          <Card className="border-muted-foreground/20">
+          <Card className="border-border/50 bg-card/85 shadow-[0_40px_100px_rgba(101,123,131,0.2)] backdrop-blur">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Sparkles className="h-5 w-5 text-primary" />
@@ -361,7 +555,7 @@ function App() {
             </CardHeader>
             <CardContent>
               {words.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-muted/60 bg-muted/20 p-10 text-center text-muted-foreground">
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/40 bg-card/70 p-10 text-center text-muted-foreground">
                   <FileText className="mb-4 h-10 w-10" />
                   <p className="font-medium text-foreground/80">
                     还没有数据
@@ -372,12 +566,12 @@ function App() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <ScrollArea className="h-[70vh] rounded-2xl border bg-background px-2 py-4">
+                  <ScrollArea className="h-[70vh] rounded-2xl border border-border/40 bg-card/70 px-2 py-4 backdrop-blur-sm">
                     <ul className="space-y-3 pr-2">
                       {displayedWords.map((word) => (
                         <li
                           key={word.word}
-                          className="space-y-3 rounded-xl bg-muted/60 px-4 py-3 text-sm"
+                          className="space-y-3 rounded-2xl border border-border/30 bg-card/80 px-4 py-4 text-sm shadow-sm"
                         >
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <div>
@@ -387,10 +581,26 @@ function App() {
                                   <span className="font-semibold capitalize">
                                     {word.word}
                                   </span>
-                                  {word.phonetic && (
-                                    <span className="text-xs text-muted-foreground">
-                                      /{word.phonetic}/
-                                    </span>
+                                  {(word.phonetic || speechSupported) && (
+                                    <div className="flex items-center gap-1">
+                                      {word.phonetic && (
+                                        <span className="text-xs text-muted-foreground">
+                                          /{word.phonetic}/
+                                        </span>
+                                      )}
+                                      {speechSupported && (
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-7 w-7 text-muted-foreground"
+                                          onClick={() => speakWord(word.word)}
+                                          aria-label={`播放 ${word.word} 的美式发音`}
+                                        >
+                                          <Volume2 className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -424,7 +634,7 @@ function App() {
                               (context, idx) => (
                                 <div
                                   key={`${word.word}-${context.subtitleId}-${idx}`}
-                                  className="rounded-lg border border-muted/50 bg-background/80 px-3 py-2"
+                                  className="rounded-xl border border-border/30 bg-background/80 px-3 py-2 shadow-inner"
                                 >
                                   <p className="font-medium text-foreground">
                                     {formatTimestamp(context.startMs)} · 第{" "}

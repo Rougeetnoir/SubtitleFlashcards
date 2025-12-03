@@ -64753,19 +64753,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "phonetic": ".simptә'mætik"
   },
   {
-    "word": "synced",
-    "difficulty": "advanced",
-    "sources": [
-      {
-        "id": "subtlex-advanced",
-        "label": "SUBTLEX Rare & Academic",
-        "difficulty": "advanced",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.03 – 0.15)"
-      }
-    ],
-    "translation": "n. synchronization 的缩略词；v. synchronize 的缩略词；[网络] 同步"
-  },
-  {
     "word": "synch",
     "difficulty": "advanced",
     "sources": [
@@ -78345,7 +78332,6 @@ export const difficultWordList = [
   "syllabus",
   "symmetrical",
   "symptomatic",
-  "synced",
   "synch",
   "syndicate",
   "synonymous",
