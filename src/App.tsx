@@ -210,63 +210,144 @@ function App() {
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="border-muted-foreground/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Upload className="h-5 w-5 text-primary" />
-                上传字幕
-              </CardTitle>
-              <CardDescription>
-                支持标准 <code>.srt</code>{" "}
-                文件，解析完全在浏览器本地完成，保证安全。
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <input
-                type="file"
-                accept=".srt"
-                ref={fileInputRef}
-                className="sr-only"
-                onChange={handleFileChange}
-              />
-              <Button
-                type="button"
-                className="w-full"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                选择字幕文件
-              </Button>
+        <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
+          <div className="space-y-6">
+            <Card className="border-muted-foreground/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Upload className="h-5 w-5 text-primary" />
+                  上传字幕
+                </CardTitle>
+                <CardDescription>
+                  支持标准 <code>.srt</code>{" "}
+                  文件，解析完全在浏览器本地完成，保证安全。
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <input
+                  type="file"
+                  accept=".srt"
+                  ref={fileInputRef}
+                  className="sr-only"
+                  onChange={handleFileChange}
+                />
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  选择字幕文件
+                </Button>
 
-              <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">使用建议</p>
-                <ul className="mt-2 list-disc space-y-1 pl-5">
-                  <li>建议选择 15-45 分钟的剧集片段，词频更集中</li>
-                  <li>支持双语字幕，我们会仅提取英文词汇</li>
-                  <li>若需要更长的清单，可拆分字幕后多次上传</li>
-                </ul>
-              </div>
-
-              {subtitleLines.length > 0 && (
-                <div className="rounded-xl bg-primary/5 p-4 text-sm">
-                  <p className="font-medium text-primary">
-                    已解析 {subtitleLines.length} 行字幕
-                  </p>
-                  <p className="text-muted-foreground">
-                    共检测到 {words.length} 个难词，按频次排序如下。
-                  </p>
+                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                  <p className="font-medium text-foreground">使用建议</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5">
+                    <li>建议选择 15-45 分钟的剧集片段，词频更集中</li>
+                    <li>支持双语字幕，我们会仅提取英文词汇</li>
+                    <li>若需要更长的清单，可拆分字幕后多次上传</li>
+                  </ul>
                 </div>
-              )}
 
-              {error && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>解析失败</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
+                {subtitleLines.length > 0 && (
+                  <div className="rounded-xl bg-primary/5 p-4 text-sm">
+                    <p className="font-medium text-primary">
+                      已解析 {subtitleLines.length} 行字幕
+                    </p>
+                    <p className="text-muted-foreground">
+                      共检测到 {words.length} 个难词，按频次排序如下。
+                    </p>
+                  </div>
+                )}
+
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>解析失败</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-muted-foreground/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  难词统计
+                </CardTitle>
+                <CardDescription>解析后可快速浏览整体表现。</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {words.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    上传字幕后，这里会显示字幕行数、唯一难词和总频次。
+                  </p>
+                ) : (
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border bg-background p-4">
+                      <p className="text-xs uppercase text-muted-foreground">
+                        字幕行数
+                      </p>
+                      <p className="text-2xl font-semibold">
+                        {subtitleLines.length}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border bg-background p-4">
+                      <p className="text-xs uppercase text-muted-foreground">
+                        唯一难词
+                      </p>
+                      <p className="text-2xl font-semibold">{words.length}</p>
+                    </div>
+                    <div className="rounded-2xl border bg-background p-4">
+                      <p className="text-xs uppercase text-muted-foreground">
+                        总频次
+                      </p>
+                      <p className="text-2xl font-semibold">{totalOccurrences}</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-muted-foreground/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <ListChecks className="h-5 w-5 text-primary" />
+                  Too Easy 控制台
+                </CardTitle>
+                <CardDescription>
+                  管理已标记的常见词，随时导出合并。
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <p>
+                  当前已标记 <span className="font-semibold">{tooEasyWords.length}</span> 个词。
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  导出为 JSON 后运行 <code>npm run apply-too-easy -- path/to/file.json</code>{" "}
+                  即可同步到 <code>data/excludedWords.json</code>。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={downloadTooEasyJson}
+                    disabled={tooEasyWords.length === 0}
+                  >
+                    下载 JSON
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={copyTooEasyToClipboard}
+                    disabled={tooEasyWords.length === 0}
+                  >
+                    复制内容
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           <Card className="border-muted-foreground/20">
             <CardHeader>
@@ -291,32 +372,7 @@ function App() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border bg-background p-4">
-                      <p className="text-xs uppercase text-muted-foreground">
-                        字幕行数
-                      </p>
-                      <p className="text-2xl font-semibold">
-                        {subtitleLines.length}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border bg-background p-4">
-                      <p className="text-xs uppercase text-muted-foreground">
-                        唯一难词
-                      </p>
-                      <p className="text-2xl font-semibold">{words.length}</p>
-                    </div>
-                    <div className="rounded-2xl border bg-background p-4">
-                      <p className="text-xs uppercase text-muted-foreground">
-                        总频次
-                      </p>
-                      <p className="text-2xl font-semibold">
-                        {totalOccurrences}
-                      </p>
-                    </div>
-                  </div>
-
-                  <ScrollArea className="h-[360px] rounded-2xl border bg-background px-2 py-4">
+                  <ScrollArea className="h-[70vh] rounded-2xl border bg-background px-2 py-4">
                     <ul className="space-y-3 pr-2">
                       {displayedWords.map((word) => (
                         <li
@@ -342,11 +398,11 @@ function App() {
                                 {word.translation || "暂无翻译数据"}
                               </p>
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline">
+                            <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:items-center">
+                              <Badge variant="outline" className="whitespace-nowrap">
                                 出现 {word.occurrences} 次
                               </Badge>
-                              <Badge variant="secondary">
+                              <Badge variant="secondary" className="whitespace-nowrap">
                                 {word.difficulty === "foundation"
                                   ? "基础"
                                   : word.difficulty === "intermediate"
@@ -357,6 +413,7 @@ function App() {
                                 variant={tooEasySet.has(word.word) ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => toggleTooEasy(word.word)}
+                                className="whitespace-nowrap"
                               >
                                 {tooEasySet.has(word.word) ? "已标记为太简单" : "太简单"}
                               </Button>
@@ -396,25 +453,6 @@ function App() {
                       仅展示前 {MAX_WORDS_DISPLAY} 个高频词，导出功能即将上线。
                     </p>
                   )}
-                </div>
-              )}
-              {tooEasyWords.length > 0 && (
-                <div className="mt-6 space-y-3 rounded-2xl border border-dashed border-muted/60 bg-muted/20 p-4 text-sm">
-                  <p className="font-semibold text-foreground">
-                    已标记 {tooEasyWords.length} 个太简单的单词
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    导出 JSON 后，可运行 <code>npm run apply-too-easy -- path/to/file.json</code>
-                    合并到 <code>data/excludedWords.json</code>。
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    <Button size="sm" variant="secondary" onClick={downloadTooEasyJson}>
-                      下载 JSON
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={copyTooEasyToClipboard}>
-                      复制内容
-                    </Button>
-                  </div>
                 </div>
               )}
             </CardContent>
