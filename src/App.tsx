@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   AlertTriangle,
   FileText,
@@ -73,6 +73,7 @@ function App() {
   const [subtitleLines, setSubtitleLines] = useState<SubtitleLine[]>([])
   const [words, setWords] = useState<ExtractedWord[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [tooEasyWords, setTooEasyWords] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const totalOccurrences = useMemo(
@@ -138,7 +139,60 @@ function App() {
     }
   }
 
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("subtitle-flashcards-too-easy")
+      if (!stored) return
+      const parsed = JSON.parse(stored)
+      if (Array.isArray(parsed)) {
+        setTooEasyWords(parsed.filter((word): word is string => typeof word === "string"))
+      }
+    } catch (err) {
+      console.error("Failed to restore too-easy words", err)
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem(
+      "subtitle-flashcards-too-easy",
+      JSON.stringify(Array.from(new Set(tooEasyWords))),
+    )
+  }, [tooEasyWords])
+
+  const tooEasySet = useMemo(() => new Set(tooEasyWords), [tooEasyWords])
+
   const displayedWords = words.slice(0, MAX_WORDS_DISPLAY)
+
+  function toggleTooEasy(word: string) {
+    setTooEasyWords((prev) => {
+      if (prev.includes(word)) {
+        return prev.filter((w) => w !== word)
+      }
+      return [...prev, word]
+    })
+  }
+
+  async function copyTooEasyToClipboard() {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(tooEasyWords, null, 2))
+    } catch (err) {
+      console.error("Failed to copy too-easy words", err)
+    }
+  }
+
+  function downloadTooEasyJson() {
+    const blob = new Blob([JSON.stringify(tooEasyWords, null, 2)], {
+      type: "application/json",
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `too-easy-${Date.now()}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -299,6 +353,13 @@ function App() {
                                     ? "进阶"
                                     : "高阶"}
                               </Badge>
+                              <Button
+                                variant={tooEasySet.has(word.word) ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => toggleTooEasy(word.word)}
+                              >
+                                {tooEasySet.has(word.word) ? "已标记为太简单" : "太简单"}
+                              </Button>
                             </div>
                           </div>
                           <div className="space-y-1 text-xs">
@@ -335,6 +396,25 @@ function App() {
                       仅展示前 {MAX_WORDS_DISPLAY} 个高频词，导出功能即将上线。
                     </p>
                   )}
+                </div>
+              )}
+              {tooEasyWords.length > 0 && (
+                <div className="mt-6 space-y-3 rounded-2xl border border-dashed border-muted/60 bg-muted/20 p-4 text-sm">
+                  <p className="font-semibold text-foreground">
+                    已标记 {tooEasyWords.length} 个太简单的单词
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    导出 JSON 后，可运行 <code>npm run apply-too-easy -- path/to/file.json</code>
+                    合并到 <code>data/excludedWords.json</code>。
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button size="sm" variant="secondary" onClick={downloadTooEasyJson}>
+                      下载 JSON
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={copyTooEasyToClipboard}>
+                      复制内容
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardContent>

@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "update-word-list": "node scripts/updateWordList.mjs",
-    "analyze-subtitle": "node scripts/analyzeSubtitle.mjs"
+    "analyze-subtitle": "node scripts/analyzeSubtitle.mjs",
+    "apply-too-easy": "node scripts/applyTooEasy.mjs"
   },
   "dependencies": {
     "@radix-ui/react-scroll-area": "^1.2.10",

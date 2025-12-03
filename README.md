@@ -53,6 +53,12 @@ npm run analyze-subtitle -- samples/subtitles/Stranger.things.S04E08.GGEZ.Englis
 
 The CSV columns are `word,count,isDifficult,difficulty,translation,definition,phonetic`. Omit `--out` to print to stdout.
 
+### Marking "Too Easy" Words
+
+- 在 UI 的难词列表中点击 “太简单” 按钮即可标记/取消，该状态会保存在浏览器 `localStorage`。
+- 点击列表下方的 “下载 JSON” 或 “复制内容” 获取 `too-easy` 清单。
+- 运行 `npm run apply-too-easy -- path/to/too-easy.json` 可将这些词合并进 `data/excludedWords.json`，随后再执行 `npm run update-word-list` 让前端忽略这些词。
+
 ## Roadmap
 
 - Export the word list to CSV/Anki.

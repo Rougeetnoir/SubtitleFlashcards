@@ -16733,39 +16733,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "phonetic": ",di:kәm'preʃәn"
   },
   {
-    "word": "decorate",
-    "difficulty": "advanced",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      },
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      },
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      },
-      {
-        "id": "subtlex-advanced",
-        "label": "SUBTLEX Rare & Academic",
-        "difficulty": "advanced",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.03 – 0.15)"
-      }
-    ],
-    "translation": "v. 装饰",
-    "definition": "v. make more attractive by adding ornament, colour, etc.；v. award a mark of honor, such as a medal, to",
-    "phonetic": "'dekәreit"
-  },
-  {
     "word": "decoration",
     "difficulty": "foundation",
     "sources": [
@@ -19822,21 +19789,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "translation": "vt. 扭曲, 歪曲；[法] 歪区, 曲解, 纂改",
     "definition": "v make false by mutilation or addition; as of a message or story；v form into a spiral shape；v twist and press out of shape；v affect as in thought or feeling；v alter the shape of (something) by stress",
     "phonetic": "dis'tɒ:t"
-  },
-  {
-    "word": "distract",
-    "difficulty": "foundation",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      }
-    ],
-    "translation": "vt. 转移, 分心, 使发狂",
-    "definition": "v. draw someone's attention away from something",
-    "phonetic": "dis'trækt"
   },
   {
     "word": "distraction",
@@ -43272,21 +43224,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "phonetic": "'ni:ɒn"
   },
   {
-    "word": "nerd",
-    "difficulty": "foundation",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      }
-    ],
-    "translation": "n. 讨厌的人；呆子",
-    "definition": "n. an intelligent but single-minded expert in a particular technical field or profession",
-    "phonetic": "nә:d"
-  },
-  {
     "word": "nervously",
     "difficulty": "intermediate",
     "sources": [
@@ -43519,21 +43456,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "translation": "n. 临睡前喝的酒, 睡帽",
     "definition": "n. an alcoholic drink taken at bedtime; often alcoholic；n. a cloth cap worn in bed；n. the final game of a double header",
     "phonetic": "'naitkæp"
-  },
-  {
-    "word": "nightfall",
-    "difficulty": "foundation",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      }
-    ],
-    "translation": "n. 傍晚, 黄昏, 日暮",
-    "definition": "n the time of day immediately following sunset",
-    "phonetic": "'naitfɒ:l"
   },
   {
     "word": "nightgown",
@@ -51605,21 +51527,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "translation": "n. 刺痕, 穿刺；vt. 刺穿, 刺, 揭穿；vi. 被刺穿",
     "definition": "n. loss of air pressure in a tire when a hole is made by some sharp object；n. a small hole made by a sharp object；n. the act of puncturing or perforating；v. pierce with a pointed object; make a hole into",
     "phonetic": "'pʌŋktʃә"
-  },
-  {
-    "word": "puppet",
-    "difficulty": "foundation",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      }
-    ],
-    "translation": "n. 傀儡, 木偶；[法] 木偶, 傀儡, 受他人操纵的人",
-    "definition": "n. a small figure of a person operated from above with strings by a puppeteer；n. a doll with a hollow head of a person or animal and a cloth body; intended to fit over the hand and be manipulated with the fingers",
-    "phonetic": "'pʌpit"
   },
   {
     "word": "purge",
@@ -66121,21 +66028,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "phonetic": "θi'ætrikl"
   },
   {
-    "word": "theft",
-    "difficulty": "intermediate",
-    "sources": [
-      {
-        "id": "subtlex-intermediate",
-        "label": "SUBTLEX Extended Academic Range",
-        "difficulty": "intermediate",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.15 – 0.6)"
-      }
-    ],
-    "translation": "n. 盗窃, 失窃, 盗窃罪, 赃物；[法] 盗窃行为, 偷窃, 失窃",
-    "definition": "n the act of taking something from someone unlawfully",
-    "phonetic": "θeft"
-  },
-  {
     "word": "thereabouts",
     "difficulty": "advanced",
     "sources": [
@@ -69161,27 +69053,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "translation": "a. 未成年的, 未及法定年龄的；n. 缺乏, 不足",
     "definition": "s. dependent by virtue of youth",
     "phonetic": "'ʌndәridʒ"
-  },
-  {
-    "word": "underestimate",
-    "difficulty": "intermediate",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      },
-      {
-        "id": "subtlex-intermediate",
-        "label": "SUBTLEX Extended Academic Range",
-        "difficulty": "intermediate",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.15 – 0.6)"
-      }
-    ],
-    "translation": "n. 低估；vt. 低估, 看轻",
-    "definition": "n. an estimation that is too low; an estimate that is less than the true or actual value；v. make too low an estimate of",
-    "phonetic": ".ʌndәr'estimeit"
   },
   {
     "word": "undergarment",
@@ -75367,7 +75238,6 @@ export const difficultWordList = [
   "decomposition",
   "decompress",
   "decompression",
-  "decorate",
   "decoration",
   "decorator",
   "decree",
@@ -75560,7 +75430,6 @@ export const difficultWordList = [
   "distillation",
   "distinctly",
   "distort",
-  "distract",
   "distraction",
   "distributor",
   "ditch",
@@ -77085,7 +76954,6 @@ export const difficultWordList = [
   "needlepoint",
   "negligence",
   "neon",
-  "nerd",
   "nervously",
   "nervousness",
   "nettle",
@@ -77102,7 +76970,6 @@ export const difficultWordList = [
   "nicht",
   "nicotine",
   "nightcap",
-  "nightfall",
   "nightgown",
   "nightingale",
   "nightlife",
@@ -77631,7 +77498,6 @@ export const difficultWordList = [
   "puma",
   "pumice",
   "puncture",
-  "puppet",
   "purge",
   "purification",
   "purity",
@@ -78561,7 +78427,6 @@ export const difficultWordList = [
   "thaw",
   "theaters",
   "theatrical",
-  "theft",
   "thereabouts",
   "thermal",
   "thermite",
@@ -78758,7 +78623,6 @@ export const difficultWordList = [
   "undefeated",
   "undependable",
   "underage",
-  "underestimate",
   "undergarment",
   "underpants",
   "underpay",
