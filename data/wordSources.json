@@ -1,0 +1,102 @@
+[
+  {
+    "id": "subtlex-foundation",
+    "label": "SUBTLEX Low Frequency Core",
+    "difficulty": "foundation",
+    "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)",
+    "type": "subtlexRange",
+    "filters": {
+      "minSubtlwf": 0.6,
+      "maxSubtlwf": 3,
+      "minLength": 4,
+      "allowProperNouns": false
+    },
+    "limit": 3000,
+    "sortDirection": "desc"
+  },
+  {
+    "id": "subtlex-intermediate",
+    "label": "SUBTLEX Extended Academic Range",
+    "difficulty": "intermediate",
+    "source": "SUBTLEXus spoken corpus (SUBTLWF 0.15 – 0.6)",
+    "type": "subtlexRange",
+    "filters": {
+      "minSubtlwf": 0.15,
+      "maxSubtlwf": 0.6,
+      "minLength": 4,
+      "allowProperNouns": false
+    },
+    "limit": 2000,
+    "sortDirection": "desc"
+  },
+  {
+    "id": "subtlex-advanced",
+    "label": "SUBTLEX Rare & Academic",
+    "difficulty": "advanced",
+    "source": "SUBTLEXus spoken corpus (SUBTLWF 0.03 – 0.15)",
+    "type": "subtlexRange",
+    "filters": {
+      "minSubtlwf": 0.03,
+      "maxSubtlwf": 0.15,
+      "minLength": 4,
+      "allowProperNouns": false
+    },
+    "limit": 1500,
+    "sortDirection": "desc"
+  },
+  {
+    "id": "legacy-sample",
+    "label": "Legacy GRE Sample List",
+    "difficulty": "advanced",
+    "source": "Initial hand-curated demo list",
+    "type": "manual",
+    "words": [
+      "abandon",
+      "abstract",
+      "academic",
+      "access",
+      "accommodate",
+      "accumulate",
+      "accurate",
+      "acquire",
+      "adapt",
+      "adequate",
+      "adjacent",
+      "advocate",
+      "aggressive",
+      "allocate",
+      "analyze",
+      "anticipate",
+      "apparent",
+      "approach",
+      "arbitrary",
+      "assess",
+      "assume",
+      "authoritative",
+      "benevolent",
+      "coherent",
+      "commodity",
+      "compatible",
+      "complement",
+      "comprehensive",
+      "conceive",
+      "concurrent",
+      "conduct",
+      "confer",
+      "constrain",
+      "controversial",
+      "convention",
+      "cooperative",
+      "correspond",
+      "crucial",
+      "cumulative",
+      "deduce",
+      "deficit",
+      "denote",
+      "derive",
+      "devote",
+      "dimension",
+      "diminish"
+    ]
+  }
+]

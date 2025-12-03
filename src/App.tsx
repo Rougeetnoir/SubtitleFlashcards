@@ -7,7 +7,11 @@ import {
   Upload,
 } from "lucide-react"
 
-import { difficultWords } from "@/data/difficultWords"
+import {
+  difficultWordList,
+  difficultWords,
+  type WordDifficulty,
+} from "@/data/difficultWords"
 import type { SubtitleLine } from "@/types"
 import { parseSrt } from "@/utils/parseSrt"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -22,15 +26,47 @@ import {
 } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
+interface WordOccurrence {
+  subtitleId: number
+  startMs: number
+  endMs: number
+  text: string
+}
+
 interface ExtractedWord {
   word: string
   occurrences: number
+  translation?: string
+  phonetic?: string
+  difficulty: WordDifficulty
+  contexts: WordOccurrence[]
 }
 
 const MAX_WORDS_DISPLAY = 50
+const MAX_CONTEXTS_PREVIEW = 3
+const DIFFICULT_WORD_SET = new Set(
+  difficultWordList.map((w) => w.toLowerCase()),
+)
+const DIFFICULT_WORD_MAP = new Map(
+  difficultWords.map((entry) => [entry.word.toLowerCase(), entry]),
+)
 
 function normalizeWord(w: string): string {
   return w.toLowerCase().replace(/^[^a-z]+|[^a-z]+$/g, "")
+}
+
+function formatTimestamp(ms: number): string {
+  if (!Number.isFinite(ms) || ms < 0) return "--:--"
+  const totalSeconds = Math.floor(ms / 1000)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  const parts = [
+    hours > 0 ? String(hours).padStart(2, "0") : null,
+    String(minutes).padStart(2, "0"),
+    String(seconds).padStart(2, "0"),
+  ].filter(Boolean)
+  return parts.join(":")
 }
 
 function App() {
@@ -55,21 +91,42 @@ function App() {
       const lines = parseSrt(text)
       setSubtitleLines(lines)
 
-      const wordCount: Record<string, number> = {}
-      const difficultSet = new Set(difficultWords.map((w) => w.toLowerCase()))
+      const wordStats: Record<string, ExtractedWord> = {}
 
       for (const line of lines) {
         const tokens = line.text.split(/\s+/)
+        const seenInLine = new Set<string>()
         for (const raw of tokens) {
           const w = normalizeWord(raw)
           if (!w) continue
-          if (!difficultSet.has(w)) continue
-          wordCount[w] = (wordCount[w] || 0) + 1
+          if (seenInLine.has(w)) continue
+          if (!DIFFICULT_WORD_SET.has(w)) continue
+          seenInLine.add(w)
+
+          const metadata = DIFFICULT_WORD_MAP.get(w)
+          if (!wordStats[w]) {
+            wordStats[w] = {
+              word: w,
+              occurrences: 0,
+              translation: metadata?.translation,
+              phonetic: metadata?.phonetic,
+              difficulty: metadata?.difficulty || "foundation",
+              contexts: [],
+            }
+          }
+
+          const entry = wordStats[w]
+          entry.occurrences += 1
+          entry.contexts.push({
+            subtitleId: line.id,
+            startMs: line.startMs,
+            endMs: line.endMs,
+            text: line.text.trim(),
+          })
         }
       }
 
-      const extracted: ExtractedWord[] = Object.entries(wordCount)
-        .map(([word, occurrences]) => ({ word, occurrences }))
+      const extracted = Object.values(wordStats)
         .sort((a, b) => b.occurrences - a.occurrences)
 
       setWords(extracted)
@@ -210,17 +267,64 @@ function App() {
                       {displayedWords.map((word) => (
                         <li
                           key={word.word}
-                          className="flex items-center justify-between rounded-xl bg-muted/60 px-4 py-3 text-sm"
+                          className="space-y-3 rounded-xl bg-muted/60 px-4 py-3 text-sm"
                         >
-                          <div className="flex items-center gap-3">
-                            <ListChecks className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-semibold capitalize">
-                              {word.word}
-                            </span>
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                            <div>
+                              <div className="flex items-center gap-3">
+                                <ListChecks className="h-4 w-4 text-muted-foreground" />
+                                <div className="flex flex-col">
+                                  <span className="font-semibold capitalize">
+                                    {word.word}
+                                  </span>
+                                  {word.phonetic && (
+                                    <span className="text-xs text-muted-foreground">
+                                      /{word.phonetic}/
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {word.translation || "暂无翻译数据"}
+                              </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <Badge variant="outline">
+                                出现 {word.occurrences} 次
+                              </Badge>
+                              <Badge variant="secondary">
+                                {word.difficulty === "foundation"
+                                  ? "基础"
+                                  : word.difficulty === "intermediate"
+                                    ? "进阶"
+                                    : "高阶"}
+                              </Badge>
+                            </div>
                           </div>
-                          <Badge variant="outline">
-                            出现 {word.occurrences} 次
-                          </Badge>
+                          <div className="space-y-1 text-xs">
+                            {word.contexts.slice(0, MAX_CONTEXTS_PREVIEW).map(
+                              (context, idx) => (
+                                <div
+                                  key={`${word.word}-${context.subtitleId}-${idx}`}
+                                  className="rounded-lg border border-muted/50 bg-background/80 px-3 py-2"
+                                >
+                                  <p className="font-medium text-foreground">
+                                    {formatTimestamp(context.startMs)} · 第{" "}
+                                    {context.subtitleId} 行
+                                  </p>
+                                  <p className="text-muted-foreground">
+                                    {context.text}
+                                  </p>
+                                </div>
+                              ),
+                            )}
+                            {word.contexts.length > MAX_CONTEXTS_PREVIEW && (
+                              <p className="text-[11px] text-muted-foreground">
+                                还有 {word.contexts.length - MAX_CONTEXTS_PREVIEW}{" "}
+                                处出现
+                              </p>
+                            )}
+                          </div>
                         </li>
                       ))}
                     </ul>
