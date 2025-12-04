@@ -56,6 +56,8 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", ...fontFamily.sans],
+        serif: ["\"Playfair Display\"", "\"EB Garamond\"", ...fontFamily.serif],
+        display: ["\"Playfair Display\"", "\"EB Garamond\"", ...fontFamily.serif],
       },
       keyframes: {
         "accordion-down": {

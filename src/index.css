@@ -1,69 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: 43.8 86.7% 94.1%;
-  --foreground: 196 12.9% 45.5%;
+  --background: 41.1 50.7% 93%;
+  --foreground: 15 18% 32%;
 
-  --muted: 45.6 42.4% 88.4%;
-  --muted-foreground: 186.3 8.3% 55.1%;
+  --muted: 207.5 20% 85%;
+  --muted-foreground: 15 15% 35%;
 
-  --popover: 45.6 42.4% 96%;
-  --popover-foreground: 196 12.9% 35.5%;
+  --popover: 41.1 50.7% 98%;
+  --popover-foreground: 15 18% 30%;
 
-  --card: 45.6 42.4% 92%;
-  --card-foreground: 196 12.9% 35.5%;
+  --card: 41.1 50.7% 96%;
+  --card-foreground: 15 18% 30%;
 
-  --border: 186.3 8.3% 70%;
-  --input: 186.3 8.3% 70%;
+  --border: 26.3 25% 82%;
+  --input: 26.3 25% 82%;
 
-  --primary: 204.8 69.4% 48.6%;
-  --primary-foreground: 43.8 86.7% 94.1%;
+  --primary: 26.3 33.9% 76.3%;
+  --primary-foreground: 15 32% 22%;
 
-  --secondary: 175.5 42% 78%;
-  --secondary-foreground: 196 12.9% 30%;
+  --secondary: 207.5 20% 76.5%;
+  --secondary-foreground: 15 25% 28%;
 
-  --accent: 45.4 100% 35.5%;
-  --accent-foreground: 43.8 86.7% 94.1%;
+  --accent: 41.1 50.7% 80%;
+  --accent-foreground: 15 18% 30%;
 
   --destructive: 1 71.2% 52.4%;
-  --destructive-foreground: 43.8 86.7% 94.1%;
+  --destructive-foreground: 41.1 50.7% 96%;
 
-  --ring: 204.8 69.4% 48.6%;
+  --ring: 207.5 20% 76.5%;
 
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: 192.2 100% 10.6%;
-  --foreground: 45.6 42.4% 88.4%;
+  --background: 15 30% 12%;
+  --foreground: 41.1 50.7% 90%;
 
-  --muted: 192.2 80.8% 14.3%;
-  --muted-foreground: 186.3 8.3% 55.1%;
+  --muted: 207.5 20% 22%;
+  --muted-foreground: 41.1 30% 80%;
 
-  --accent: 175.5 58.6% 39.8%;
-  --accent-foreground: 45.6 42.4% 88.4%;
+  --accent: 26.3 33.9% 30%;
+  --accent-foreground: 41.1 50.7% 90%;
 
-  --popover: 192.2 80.8% 14.3%;
-  --popover-foreground: 45.6 42.4% 88.4%;
+  --popover: 15 30% 16%;
+  --popover-foreground: 41.1 50.7% 90%;
 
-  --card: 192.2 80.8% 14.3%;
-  --card-foreground: 45.6 42.4% 88.4%;
+  --card: 15 30% 18%;
+  --card-foreground: 41.1 50.7% 90%;
 
-  --border: 194.5 14.1% 30%;
-  --input: 194.5 14.1% 30%;
+  --border: 26.3 25% 32%;
+  --input: 26.3 25% 32%;
 
-  --primary: 204.8 69.4% 48.6%;
-  --primary-foreground: 45.6 42.4% 88.4%;
+  --primary: 26.3 33.9% 60%;
+  --primary-foreground: 15 30% 12%;
 
-  --secondary: 192.2 80.8% 18%;
-  --secondary-foreground: 45.6 42.4% 88.4%;
+  --secondary: 207.5 20% 30%;
+  --secondary-foreground: 41.1 50.7% 90%;
 
-  --destructive: 1 71.2% 52.4%;
-  --destructive-foreground: 45.6 42.4% 88.4%;
+  --destructive: 0 65% 50%;
+  --destructive-foreground: 41.1 50.7% 90%;
 
-  --ring: 175.5 58.6% 39.8%;
+  --ring: 207.5 20% 55%;
 }
 
 @layer base {
@@ -75,14 +77,14 @@
     @apply bg-background font-sans text-foreground antialiased;
     background-color: hsl(var(--background));
     background-image: radial-gradient(
-        circle at 15% 20%,
-        hsla(204.8, 69.4%, 48.6%, 0.18),
+        circle at 12% 15%,
+        hsla(207.5, 20%, 76.5%, 0.35),
         transparent 45%
       ),
       radial-gradient(
-        circle at 80% 0%,
-        hsla(45.4, 100%, 35.5%, 0.12),
-        transparent 60%
+        circle at 80% -5%,
+        hsla(26.3, 33.9%, 76.3%, 0.25),
+        transparent 55%
       );
     background-attachment: fixed;
   }
@@ -90,5 +92,14 @@
   code {
     @apply rounded-md bg-secondary px-1.5 py-0.5 font-medium text-secondary-foreground;
     font-size: 0.85em;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: "Playfair Display", "EB Garamond", serif;
+    letter-spacing: 0.03em;
+    font-feature-settings: "liga" on, "kern" on;
   }
 }

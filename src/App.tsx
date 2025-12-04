@@ -84,6 +84,9 @@ function App() {
   >(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const speechVoiceRef = useRef<SpeechSynthesisVoice | null>(null)
+  const leftColumnRef = useRef<HTMLDivElement | null>(null)
+  const [leftColumnHeight, setLeftColumnHeight] = useState(0)
+  const [isDesktop, setIsDesktop] = useState(false)
   const isDev = import.meta.env.DEV
 
   const totalOccurrences = useMemo(
@@ -203,6 +206,45 @@ function App() {
     )
   }, [tooEasyWords])
 
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const media = window.matchMedia("(min-width: 1024px)")
+    function update() {
+      setIsDesktop(media.matches)
+    }
+    update()
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", update)
+    } else if (typeof media.addListener === "function") {
+      media.addListener(update)
+    }
+    return () => {
+      if (typeof media.removeEventListener === "function") {
+        media.removeEventListener("change", update)
+      } else if (typeof media.removeListener === "function") {
+        media.removeListener(update)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isDesktop) {
+      setLeftColumnHeight(0)
+      return
+    }
+    if (typeof ResizeObserver === "undefined") return
+    const el = leftColumnRef.current
+    if (!el) return
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (entry) {
+        setLeftColumnHeight(entry.contentRect.height)
+      }
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isDesktop])
+
   const tooEasySet = useMemo(() => new Set(tooEasyWords), [tooEasyWords])
 
   const displayedWords = words.slice(0, MAX_WORDS_DISPLAY)
@@ -317,7 +359,7 @@ function App() {
 
   return (
     <div className="min-h-screen px-4 py-10 sm:py-12">
-      <main className="container relative z-10 max-w-5xl space-y-10 py-4 lg:py-10">
+      <main className="container relative z-10 max-w-5xl space-y-10 py-4 lg:space-y-6 lg:py-6">
         <section className="flex flex-col items-center rounded-[32px] border border-border/50 bg-card/80 px-6 py-10 text-center shadow-[0_40px_90px_rgba(101,123,131,0.2)] backdrop-blur">
           <Badge
             variant="secondary"
@@ -325,7 +367,7 @@ function App() {
           >
             Beta · Vocabulary Lab
           </Badge>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          <h1 className="font-display text-4xl uppercase tracking-[0.12em] text-foreground sm:text-5xl">
             Subtitle Flashcards
           </h1>
           <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
@@ -334,8 +376,11 @@ function App() {
           </p>
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
-          <div className="space-y-6">
+        <div className="lg:flex lg:gap-8">
+          <div
+            ref={leftColumnRef}
+            className="space-y-6 lg:sticky lg:top-6 lg:w-[360px] lg:flex-shrink-0 lg:overflow-y-auto lg:pr-4 lg:max-h-[calc(100vh-3rem)]"
+          >
             <Card className="border-border/50 bg-card/80 shadow-[0_25px_70px_rgba(101,123,131,0.15)] backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl">
@@ -543,32 +588,40 @@ function App() {
             </Card>
           </div>
 
-          <Card className="border-border/50 bg-card/85 shadow-[0_40px_100px_rgba(101,123,131,0.2)] backdrop-blur">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Sparkles className="h-5 w-5 text-primary" />
-                难词列表
-              </CardTitle>
-              <CardDescription>
-                词表长度：{words.length} 个；总出现次数：{totalOccurrences} 次。
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {words.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/40 bg-card/70 p-10 text-center text-muted-foreground">
-                  <FileText className="mb-4 h-10 w-10" />
-                  <p className="font-medium text-foreground/80">
-                    还没有数据
-                  </p>
-                  <p className="text-sm">
-                    上传字幕后，筛选结果会显示在这里。
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <ScrollArea className="h-[70vh] rounded-2xl border border-border/40 bg-card/70 px-2 py-4 backdrop-blur-sm">
-                    <ul className="space-y-3 pr-2">
-                      {displayedWords.map((word) => (
+          <div className="mt-10 lg:mt-0 lg:flex-1 lg:h-full">
+            <Card
+              className="border-border/50 bg-card/85 shadow-[0_40px_100px_rgba(101,123,131,0.2)] backdrop-blur lg:flex lg:h-full lg:flex-col lg:overflow-hidden"
+              style={
+                isDesktop && leftColumnHeight > 0
+                  ? { minHeight: leftColumnHeight }
+                  : undefined
+              }
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  难词列表
+                </CardTitle>
+                <CardDescription>
+                  词表长度：{words.length} 个；总出现次数：{totalOccurrences} 次。
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="lg:flex-1 lg:overflow-hidden">
+                {words.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/40 bg-card/70 p-10 text-center text-muted-foreground">
+                    <FileText className="mb-4 h-10 w-10" />
+                    <p className="font-medium text-foreground/80">
+                      还没有数据
+                    </p>
+                    <p className="text-sm">
+                      上传字幕后，筛选结果会显示在这里。
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 lg:flex lg:h-full lg:flex-col">
+                    <ScrollArea className="h-[70vh] rounded-2xl border border-border/40 bg-card/70 px-2 py-4 backdrop-blur-sm lg:h-full lg:flex-1">
+                      <ul className="space-y-3 pr-2">
+                        {displayedWords.map((word) => (
                         <li
                           key={word.word}
                           className="space-y-3 rounded-2xl border border-border/30 bg-card/80 px-4 py-4 text-sm shadow-sm"
@@ -668,6 +721,7 @@ function App() {
             </CardContent>
           </Card>
         </div>
+      </div>
       </main>
     </div>
   )

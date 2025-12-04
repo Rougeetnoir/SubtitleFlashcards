@@ -5767,21 +5767,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "phonetic": "'bedtaim"
   },
   {
-    "word": "beep",
-    "difficulty": "foundation",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      }
-    ],
-    "translation": "n. 短而尖的声音, 嘟；v. 嘟嘟响",
-    "definition": "n. a short high tone produced as a signal or warning；v. call, summon, or alert with a beeper",
-    "phonetic": "bi:p"
-  },
-  {
     "word": "beeper",
     "difficulty": "foundation",
     "sources": [
@@ -23763,21 +23748,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "phonetic": "iks'plɔ:rәtәri"
   },
   {
-    "word": "explorer",
-    "difficulty": "foundation",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      }
-    ],
-    "translation": "n. 探险家, 探测者, 勘探器；[医] 探察器",
-    "definition": "n. someone who travels into little known regions (especially for some scientific purpose)",
-    "phonetic": "ik'splɒ:rә"
-  },
-  {
     "word": "exterior",
     "difficulty": "advanced",
     "sources": [
@@ -27705,21 +27675,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "translation": "n. 门, 通路；[计] 网关",
     "definition": "n. an entrance that can be closed by a gate",
     "phonetic": "'geitwei"
-  },
-  {
-    "word": "gathering",
-    "difficulty": "intermediate",
-    "sources": [
-      {
-        "id": "subtlex-intermediate",
-        "label": "SUBTLEX Extended Academic Range",
-        "difficulty": "intermediate",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.15 – 0.6)"
-      }
-    ],
-    "translation": "n. 集合, 聚集；vi. 聚集, 集合, 渐增；vt. 使聚集, 搜集, 积聚",
-    "definition": "n. sewing consisting of small folds or puckers made by pulling tight a thread in a line of stitching；n. the act of gathering something；v. assemble or get together；v. conclude from evidence",
-    "phonetic": "'gæðә"
   },
   {
     "word": "gator",
@@ -50918,21 +50873,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "phonetic": "prә'nauns"
   },
   {
-    "word": "pronto",
-    "difficulty": "foundation",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      }
-    ],
-    "translation": "adv. 很快地, 马上",
-    "definition": "r in a punctual manner",
-    "phonetic": "'prɒntәu"
-  },
-  {
     "word": "pronunciation",
     "difficulty": "intermediate",
     "sources": [
@@ -64950,21 +64890,6 @@ export const difficultWords: DifficultWordEntry[] = [
     "phonetic": "'tæki"
   },
   {
-    "word": "taco",
-    "difficulty": "foundation",
-    "sources": [
-      {
-        "id": "subtlex-foundation",
-        "label": "SUBTLEX Low Frequency Core",
-        "difficulty": "foundation",
-        "source": "SUBTLEXus spoken corpus (SUBTLWF 0.6 – 3)"
-      }
-    ],
-    "translation": "n. 墨西哥煎玉米卷；[美俚]墨西哥人",
-    "definition": "n. a tortilla rolled cupped around a filling",
-    "phonetic": "'tɑ:kәu"
-  },
-  {
     "word": "tactful",
     "difficulty": "intermediate",
     "sources": [
@@ -74516,7 +74441,6 @@ export const difficultWordList = [
   "bedfellow",
   "bedside",
   "bedtime",
-  "beep",
   "beeper",
   "beetle",
   "befall",
@@ -75676,7 +75600,6 @@ export const difficultWordList = [
   "exploit",
   "exploration",
   "exploratory",
-  "explorer",
   "exterior",
   "exterminate",
   "exterminator",
@@ -75932,7 +75855,6 @@ export const difficultWordList = [
   "gasp",
   "gasser",
   "gateway",
-  "gathering",
   "gator",
   "gauge",
   "gawk",
@@ -77444,7 +77366,6 @@ export const difficultWordList = [
   "promptly",
   "prone",
   "pronounce",
-  "pronto",
   "pronunciation",
   "prop",
   "propane",
@@ -78344,7 +78265,6 @@ export const difficultWordList = [
   "tacit",
   "tack",
   "tacky",
-  "taco",
   "tactful",
   "tadpole",
   "tailor",
